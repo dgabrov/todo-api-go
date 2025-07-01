@@ -54,6 +54,7 @@ func loadConfig() (data.Config, error) {
 
 	// all is good, will populate the value for the password in the main config data
 	dbConfig := config.Db
+	slog.Info(fmt.Sprintf("secret loaded password is: %s", secret.Password))
 	dbConfig.Password = secret.Password
 
 	// let's log the config information
