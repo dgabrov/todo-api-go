@@ -1,9 +1,8 @@
 name: build todo api go
 run-name: build todo api go
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+
 jobs:
   docker_login:
     runs-on: ubuntu-latest
