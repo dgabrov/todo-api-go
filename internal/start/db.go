@@ -6,7 +6,6 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"gitlab.com/dgb9/todo-api/internal/data"
-	"log/slog"
 )
 
 func connectDb(config data.DbConfig) (*sql.DB, error) {
@@ -17,7 +16,6 @@ func connectDb(config data.DbConfig) (*sql.DB, error) {
 	port := config.Port
 
 	url := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", user, password, machine, port, database)
-	slog.Info(fmt.Sprintf("url value:>>>%s<<<", url))
 	db, err := sql.Open("mysql", url)
 	if err != nil {
 		return nil, err

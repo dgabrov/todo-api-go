@@ -53,18 +53,17 @@ func loadConfig() (data.Config, error) {
 	}
 
 	// all is good, will populate the value for the password in the main config data
-	dbConfig := config.Db
 	config.Db.Password = secret.Password
 
 	// let's log the config information
 	slog.Info("System configuration")
-	slog.Info(fmt.Sprintf("database user: %s", dbConfig.User))
-	slog.Info(fmt.Sprintf("database machine: %s", dbConfig.Machine))
-	slog.Info(fmt.Sprintf("database db: %s", dbConfig.Database))
-	slog.Info(fmt.Sprintf("database port: %d", dbConfig.Port))
+	slog.Info(fmt.Sprintf("database user: %s", config.Db.User))
+	slog.Info(fmt.Sprintf("database machine: %s", config.Db.Machine))
+	slog.Info(fmt.Sprintf("database db: %s", config.Db.Database))
+	slog.Info(fmt.Sprintf("database port: %d", config.Db.Port))
 
 	passwordMessage := "empty"
-	if len(dbConfig.Password) > 0 {
+	if len(config.Db.Password) > 0 {
 		passwordMessage = "filled out"
 	}
 
