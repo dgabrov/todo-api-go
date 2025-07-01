@@ -1,0 +1,24 @@
+ENSURE ALL THE ITEMS THAT ARE RETURNED ARE WITH LOWER CASE!!!
+
+done app.get('//?', getMain);
+done app.post('//?login', postLogin);
+done app.post('//?addLogin', postAddLogin);
+done app.post('//?removeLogin', postRemoveLogin);
+done app.post('//?updatePriority', postUpdatePriority);
+done app.post('//?toggleCompleted', postToggleCompleted);
+done app.post('//?logout', postLogout);
+done app.post('//?switchSeqno', switchSeqNo);
+done app.post('//?removeTodo', postRemoveTodo);
+done app.post('//?retrieveTodo', postRetrieveTodo);
+done done app.post('//?updateDue', postUpdateDue);
+done app.post('//?updateTodo', postUpdateTodo);
+done app.post('//?removeAttachment', postRemoveAttachment);
+done app.post('//?multipleTodo', postMultipleTodo);
+done app.post('//?removeItem', postRemoveItem);
+done app.post('//?updateItem', postUpdateItem);
+done app.post('//?updateAttachment', upload.single('file'), postUpdateAttachment);
+done app.get('//?flaggedItems', getFlaggedItems);
+done app.post('//?searchItem', postSearchItem);
+done app.post('//?addBulkAttachment', upload.array('file'), postAddBulkAttachment);
+done app.get('//?processDownload', getDownload);
+

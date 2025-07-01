@@ -1,0 +1,205 @@
+###
+POST http://localhost:3001/login
+Content-Type: application/json
+
+{
+  "login": "test1",
+  "password": "test1"
+}
+
+###
+POST http://localhost:3001/retrieveTodo
+Content-Type: application/json
+Authorization: bearer b36ea227-849b-47b7-acda-cd9b69e3c135
+
+{
+  "todoItemId": "doia"
+}
+
+###
+POST http://localhost:3001/updateDue
+Content-Type: application/json
+Authorization: bearer b36ea227-849b-47b7-acda-cd9b69e3c135
+
+{
+  "todoItemId": "doia"
+}
+
+###
+POST http://localhost:3001/removeAttachment
+Content-Type: application/json
+Authorization: bearer c24ed48a-46e1-444b-af57-014a3c04bf6e
+
+{
+  "ids": [
+    "af6122bd-3595-40ea-8b3b-5098b46c3839"
+  ]
+}
+
+###
+POST http://localhost:3001/search
+Content-Type: application/json
+Authorization: bearer beae0004-ee7c-4744-9647-68cc1b30c04a
+
+{
+  "context": [
+    "ctx"
+  ],
+  "dueInterval": [],
+  "dueNull": true,
+  "login": [],
+  "general": [
+    "other"
+  ],
+  "project": [
+    "la",
+    "laila",
+    "scp"
+  ],
+  "completed": null
+}
+
+###
+POST http://localhost:3001/multipleTodo
+Content-Type: application/json
+Authorization: bearer ae5efb37-44f3-4435-9706-a55eda119fc0
+
+{
+  "personId": "487e324f-dc39-4889-8930-6f9685528a3a",
+  "comments": [
+    "first",
+    "",
+    "third",
+    "another"
+  ],
+  "projectCd": "info11",
+  "contextCd": null,
+  "priority": 20,
+  "due": null
+}
+
+###
+POST http://localhost:3001/bulkUpdate
+Content-Type: application/json
+Authorization: bearer ae5efb37-44f3-4435-9706-a55eda119fc0
+
+{
+  "todoIds": [
+    "d43e5048-b4b9-4e98-81eb-2c49d37e231c",
+    "a0ab2292-62bd-45ce-8821-9c2484e304cc",
+    "131378d4-1826-409b-a0e0-281148c0ec9a",
+    "0d26369f-24b7-44e3-b598-596068ed71e8",
+    "c1c3986c-2db1-4bdd-bdfc-6beb3f67dfa9"
+  ],
+  "ownerId": "1",
+  "context": "",
+  "project": "",
+  "due": null,
+  "priority": 0,
+  "selectedOwner": false,
+  "selectedContext": true,
+  "selectedDue": true,
+  "selectedPriority": true,
+  "selectedProject": true
+}
+
+###
+POST http://localhost:3001/removeItem
+Content-Type: application/json
+Authorization: bearer 2ba54e31-d380-4b78-960d-a7c16d28ca5a
+
+{
+  "ids": [
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+###
+POST http://localhost:3001/updateItem
+Content-Type: application/json
+Authorization: bearer d0d3cf57-66d9-4070-b41e-761c192e7d0c
+
+{
+  "adding": false,
+  "item": {
+    "itemId": "8329c09e-b657-41a0-b98e-a6d65895265e",
+    "flagged": false,
+    "personId": "487e324f-dc39-4889-8930-6f9685528a3a",
+    "name": "info1 modified",
+    "description": "modified description",
+    "category": "antoher category modified",
+    "updated": "2025-06-26T17:48:52.578Z",
+    "added": "2025-06-26T17:48:52.578Z"
+  }
+}
+
+###
+POST http://localhost:3001/updateAttachment
+Content-Type: multipart/form-data; boundary=bnd12
+Authorization: bearer c24ed48a-46e1-444b-af57-014a3c04bf6e
+
+--bnd12
+Content-Disposition: form-data; name="file"; filename="tester.txt"
+Content-Type: text/plain
+
+< tester.txt
+--bnd12
+Content-Disposition: form-data; name="data"
+Content-Type: application/json
+
+{
+"adding":true,
+"attachment":
+{"attachmentId":"af6122bd-3595-40ea-8b3b-5098b46c3839","itemId":"8329c09e-b657-41a0-b98e-a6d65895265e",
+"fileName":"","description":"dfsd s sd fsdf sdf sd","seqNo":0,
+"contentType":"","added":"2025-06-26T18:40:36.327Z","updated":"2025-06-26T18:40:36.327Z"}}
+
+--bnd12--
+
+###
+GET http://localhost:3001/flaggedItems
+Authorization: bearer c24ed48a-46e1-444b-af57-014a3c04bf6e
+
+
+
+###
+POST http://localhost:3001/searchItem
+Authorization: bearer 9debf5cd-694c-4750-a649-26a0f8b5d1e7
+Content-Type: application/json
+
+{
+  "search": "first second third fourth fifth"
+}
+
+####
+POST http://localhost:3001/addBulkAttachment
+Authorization: bearer 9debf5cd-694c-4750-a649-26a0f8b5d1e7
+Content-Type: multipart/form-data; boundary=aslkdfjasldfjkasldfjkasldfjk
+
+--aslkdfjasldfjkasldfjkasldfjk
+Content-Disposition: form-data; name="file"; filename="tester.txt"
+Content-Type: application/octet-stream
+
+< tester.txt
+--aslkdfjasldfjkasldfjkasldfjk
+Content-Disposition: form-data; name="file"; filename="tester.txt"
+Content-Type: application/octet-stream
+
+< tester.txt
+--aslkdfjasldfjkasldfjkasldfjk
+Content-Disposition: form-data; name="file"; filename="tester.txt"
+Content-Type: application/octet-stream
+
+< tester.txt
+--aslkdfjasldfjkasldfjkasldfjk
+Content-Disposition: form-data; name="data"
+Content-Type: application/json
+
+{"itemId":"1","name":"informecea"}
+--aslkdfjasldfjkasldfjkasldfjk--
+
+###
+GET http://localhost:3001/download?id=5e3f3116-55f7-4830-9463-1be38a3a03f0
+Cookie: token12=cc06b6cd-08d3-4bd9-a709-6b1c9eef511f

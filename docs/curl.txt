@@ -1,0 +1,7 @@
+curl -X POST http://localhost:3001/addBulkAttachment \
+  -H "Authorization: bearer put some token here" \
+  -F "file=@tester.txt" \
+  -F "file=@tester1.txt" \
+  -F "file=@tester2.txt" \
+  -F "data={\"itemId\":\"1\",\"name\":\"informecea\"};type=application/json"
+
