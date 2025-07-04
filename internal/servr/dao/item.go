@@ -135,7 +135,7 @@ func LoadCompleteItemsByIds(ctx context.Context, tx *sql.Tx, ids []string) ([]da
 			}
 
 			if aContentType.Valid {
-				att.ContentType = aContentType.String
+				att.ContentType = &aContentType.String
 			}
 
 			if aSeqNo.Valid {

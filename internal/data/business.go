@@ -37,7 +37,7 @@ type AttachmentData struct {
 	ItemId       string    `json:"itemId"`
 	Description  string    `json:"description"`
 	FileName     string    `json:"fileName"`
-	ContentType  string    `json:"contentType"`
+	ContentType  *string   `json:"contentType"`
 	SeqNo        int       `json:"seqNo"`
 	Added        time.Time `json:"added"`
 	Updated      time.Time `json:"updated"`

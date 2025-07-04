@@ -78,12 +78,13 @@ func (h *addBulkAttachment) processAddBulkAttachment(r *http.Request) ([]data.At
 
 		// build the file attachment
 		newId := uuid.New().String()
+		contentType := ""
 		att := data.AttachmentData{
 			AttachmentId: newId,
 			ItemId:       itemId,
 			Description:  name,
 			FileName:     fileName,
-			ContentType:  "",
+			ContentType:  &contentType,
 			SeqNo:        newSeq,
 			Added:        tm,
 			Updated:      tm,
