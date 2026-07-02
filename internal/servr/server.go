@@ -40,6 +40,7 @@ type Servr interface {
 	GetUploadedFileName(id string) string
 	LoadItem(ctx context.Context, itemId string) (data.CompleteItemData, error)
 	GetPasswordByUserId(ctx context.Context, id string, password string) (data.PasswordData, error)
+	UpdatePasswordByUserId(ctx context.Context, personId string, password string, payload data.PasswordData) error
 }
 
 type server struct {
@@ -107,6 +108,54 @@ func (h *server) GetPasswordByUserId(ctx context.Context, personId string, passw
 	}
 
 	return res, tx.Commit()
+}
+
+func (h *server) UpdatePasswordByUserId(ctx context.Context, personId string, password string, payload data.PasswordData) error {
+	tx, err := begin(ctx, h.db)
+	if err != nil {
+		return err
+	}
+	defer rollback(tx)
+
+	salt, encryptedPayload, err := getPasswordData(ctx, tx, personId)
+	if err != nil {
+		return err
+	}
+
+	var key []byte
+
+	if len(salt) == 0 {
+		salt, err = generateSalt()
+		if err != nil {
+			return err
+		}
+		key = deriveKey(password, salt)
+	} else {
+		if len(encryptedPayload) == 0 {
+			return errors.New("payload is empty but salt is not — data is inconsistent")
+		}
+		key = deriveKey(password, salt)
+		_, err = decryptAES(key, encryptedPayload)
+		if err != nil {
+			return errors.New("the provided password is not correct")
+		}
+	}
+
+	plaintext, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+	newEncryptedPayload, err := encryptAES(key, plaintext)
+	if err != nil {
+		return err
+	}
+
+	err = updatePasswordData(ctx, tx, personId, salt, newEncryptedPayload)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (h *server) LoadItem(ctx context.Context, itemId string) (data.CompleteItemData, error) {
