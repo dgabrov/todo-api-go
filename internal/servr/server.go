@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -73,9 +74,39 @@ func updatePasswordData(ctx context.Context, tx *sql.Tx, personId string, salt [
 }
 
 func (h *server) GetPasswordByUserId(ctx context.Context, personId string, password string) (data.PasswordData, error) {
-	res := data.PasswordData{}
+	res := data.PasswordData{Passwords: make([]data.SecretData, 0)}
 
-	return res, nil
+	tx, err := begin(ctx, h.db)
+	if err != nil {
+		return res, err
+	}
+	defer rollback(tx)
+
+	salt, encryptedPayload, err := getPasswordData(ctx, tx, personId)
+	if err != nil {
+		return res, err
+	}
+
+	if len(salt) == 0 {
+		return res, tx.Commit()
+	}
+
+	if len(encryptedPayload) == 0 {
+		return res, errors.New("payload is empty but salt is not — data is inconsistent")
+	}
+
+	key := deriveKey(password, salt)
+	plaintext, err := decryptAES(key, encryptedPayload)
+	if err != nil {
+		return res, errors.New("the provided password is not correct")
+	}
+
+	err = json.Unmarshal(plaintext, &res)
+	if err != nil {
+		return res, err
+	}
+
+	return res, tx.Commit()
 }
 
 func (h *server) LoadItem(ctx context.Context, itemId string) (data.CompleteItemData, error) {
