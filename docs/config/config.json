@@ -3,14 +3,13 @@
     "machine": "localhost",
     "port": 3306,
     "user": "todo",
-    "password": "todo",
     "database": "todo"
   },
   "server": {
     "address": "0.0.0.0:3001",
     "authServerUrl" : "https://cbox.info/abax/loginNoToken",
     "right" : "attach_connect",
-    "storageFolder": "C:\\Users\\dgabr\\work\\todo-api-gitlab\\docs\\files\\",
-    "context": "/api"
+    "storageFolder": "/home/daniel/IdeaProjects/todo-api-go/files/",
+    "context": "/todoapi"
   }
 }

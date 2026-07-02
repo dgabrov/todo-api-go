@@ -1,2 +1,5 @@
 .idea/
 *.iml
+
+# avoid putting the uploaded files in the source control while keeping them under project
+/files/

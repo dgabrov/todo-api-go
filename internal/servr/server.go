@@ -3,8 +3,10 @@ package servr
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"errors"
 	"fmt"
+
 	"gitlab.com/dgb9/todo-api/internal/data"
 	"gitlab.com/dgb9/todo-api/internal/servr/dao"
 )
@@ -36,11 +38,44 @@ type Servr interface {
 	GetMaxAttachmentSeq(ctx context.Context, id string) (int, error)
 	GetUploadedFileName(id string) string
 	LoadItem(ctx context.Context, itemId string) (data.CompleteItemData, error)
+	GetPasswordByUserId(ctx context.Context, id string, password string) (data.PasswordData, error)
 }
 
 type server struct {
 	db     *sql.DB
 	config data.ServerConfig
+}
+
+func getPasswordData(ctx context.Context, tx *sql.Tx, personId string) (salt []byte, payload []byte, err error) {
+	saltStr, payloadStr, err := dao.GetPersonPasswordData(ctx, tx, personId)
+	if err != nil || saltStr == "" {
+		return nil, nil, err
+	}
+	salt, err = base64.StdEncoding.DecodeString(saltStr)
+	if err != nil {
+		return nil, nil, err
+	}
+	if payloadStr != "" {
+		payload, err = base64.StdEncoding.DecodeString(payloadStr)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+	return salt, payload, nil
+}
+
+func updatePasswordData(ctx context.Context, tx *sql.Tx, personId string, salt []byte, payload []byte) error {
+	return dao.UpdatePersonPasswordData(
+		ctx, tx, personId,
+		base64.StdEncoding.EncodeToString(salt),
+		base64.StdEncoding.EncodeToString(payload),
+	)
+}
+
+func (h *server) GetPasswordByUserId(ctx context.Context, personId string, password string) (data.PasswordData, error) {
+	res := data.PasswordData{}
+
+	return res, nil
 }
 
 func (h *server) LoadItem(ctx context.Context, itemId string) (data.CompleteItemData, error) {

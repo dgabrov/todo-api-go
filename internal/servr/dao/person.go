@@ -56,3 +56,33 @@ func UpdatePerson(ctx context.Context, tx *sql.Tx, person data.Person) error {
 
 	return err
 }
+
+func GetPersonPasswordData(ctx context.Context, tx *sql.Tx, personId string) (salt string, payload string, err error) {
+	strSql := "select password_salt, password_payload from person where person_id = ?"
+	stat, err := tx.PrepareContext(ctx, strSql)
+	if err != nil {
+		return "", "", err
+	}
+
+	rs, err := stat.QueryContext(ctx, personId)
+	if err != nil {
+		return "", "", err
+	}
+	defer rs.Close()
+
+	if rs.Next() {
+		err = rs.Scan(&salt, &payload)
+	}
+	return salt, payload, err
+}
+
+func UpdatePersonPasswordData(ctx context.Context, tx *sql.Tx, personId string, salt string, payload string) error {
+	strSql := "update person set password_salt = ?, password_payload = ? where person_id = ?"
+	stat, err := tx.PrepareContext(ctx, strSql)
+	if err != nil {
+		return err
+	}
+
+	_, err = stat.ExecContext(ctx, salt, payload, personId)
+	return err
+}
