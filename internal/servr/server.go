@@ -3,8 +3,11 @@ package servr
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
+
 	"gitlab.com/dgb9/todo-api/internal/data"
 	"gitlab.com/dgb9/todo-api/internal/servr/dao"
 )
@@ -36,11 +39,123 @@ type Servr interface {
 	GetMaxAttachmentSeq(ctx context.Context, id string) (int, error)
 	GetUploadedFileName(id string) string
 	LoadItem(ctx context.Context, itemId string) (data.CompleteItemData, error)
+	GetPasswordByUserId(ctx context.Context, id string, password string) (data.PasswordData, error)
+	UpdatePasswordByUserId(ctx context.Context, personId string, password string, payload data.PasswordData) error
 }
 
 type server struct {
 	db     *sql.DB
 	config data.ServerConfig
+}
+
+func getPasswordData(ctx context.Context, tx *sql.Tx, personId string) (salt []byte, payload []byte, err error) {
+	saltStr, payloadStr, err := dao.GetPersonPasswordData(ctx, tx, personId)
+	if err != nil || saltStr == "" {
+		return nil, nil, err
+	}
+	salt, err = base64.StdEncoding.DecodeString(saltStr)
+	if err != nil {
+		return nil, nil, err
+	}
+	if payloadStr != "" {
+		payload, err = base64.StdEncoding.DecodeString(payloadStr)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+	return salt, payload, nil
+}
+
+func updatePasswordData(ctx context.Context, tx *sql.Tx, personId string, salt []byte, payload []byte) error {
+	return dao.UpdatePersonPasswordData(
+		ctx, tx, personId,
+		base64.StdEncoding.EncodeToString(salt),
+		base64.StdEncoding.EncodeToString(payload),
+	)
+}
+
+func (h *server) GetPasswordByUserId(ctx context.Context, personId string, password string) (data.PasswordData, error) {
+	res := data.PasswordData{Passwords: make([]data.SecretData, 0)}
+
+	tx, err := begin(ctx, h.db)
+	if err != nil {
+		return res, err
+	}
+	defer rollback(tx)
+
+	salt, encryptedPayload, err := getPasswordData(ctx, tx, personId)
+	if err != nil {
+		return res, err
+	}
+
+	if len(salt) == 0 {
+		return res, tx.Commit()
+	}
+
+	if len(encryptedPayload) == 0 {
+		return res, errors.New("payload is empty but salt is not — data is inconsistent")
+	}
+
+	key := deriveKey(password, salt)
+	plaintext, err := decryptAES(key, encryptedPayload)
+	if err != nil {
+		return res, errors.New("the provided password is not correct")
+	}
+
+	err = json.Unmarshal(plaintext, &res)
+	if err != nil {
+		return res, err
+	}
+
+	return res, tx.Commit()
+}
+
+func (h *server) UpdatePasswordByUserId(ctx context.Context, personId string, password string, payload data.PasswordData) error {
+	tx, err := begin(ctx, h.db)
+	if err != nil {
+		return err
+	}
+	defer rollback(tx)
+
+	salt, encryptedPayload, err := getPasswordData(ctx, tx, personId)
+	if err != nil {
+		return err
+	}
+
+	var key []byte
+
+	if len(salt) == 0 {
+		salt, err = generateSalt()
+		if err != nil {
+			return err
+		}
+		key = deriveKey(password, salt)
+	} else {
+		if len(encryptedPayload) == 0 {
+			return errors.New("payload is empty but salt is not — data is inconsistent")
+		}
+		key = deriveKey(password, salt)
+		_, err = decryptAES(key, encryptedPayload)
+		if err != nil {
+			return errors.New("the provided password is not correct")
+		}
+	}
+
+	plaintext, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+	newEncryptedPayload, err := encryptAES(key, plaintext)
+	if err != nil {
+		return err
+	}
+
+	err = updatePasswordData(ctx, tx, personId, salt, newEncryptedPayload)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (h *server) LoadItem(ctx context.Context, itemId string) (data.CompleteItemData, error) {

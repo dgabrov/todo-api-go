@@ -3,9 +3,10 @@ package controller
 import (
 	"database/sql"
 	"fmt"
-	"gitlab.com/dgb9/todo-api/internal/data"
 	"log"
 	"net/http"
+
+	"gitlab.com/dgb9/todo-api/internal/data"
 )
 
 func StartRouter(db *sql.DB, config data.ServerConfig) error {
@@ -34,6 +35,8 @@ func StartRouter(db *sql.DB, config data.ServerConfig) error {
 	mux.Handle(fmt.Sprintf("POST %s/searchItem", context), searchItemController(db, config))
 	mux.Handle(fmt.Sprintf("POST %s/addBulkAttachment", context), addBulkAttachmentController(db, config))
 	mux.Handle(fmt.Sprintf("GET %s/processDownload", context), downloadController(db, config))
+	mux.Handle(fmt.Sprintf("POST %s/password", context), passwordPostController(db, config))
+	mux.Handle(fmt.Sprintf("PUT %s/password", context), passwordPutController(db, config))
 
 	corsRouter := corsMiddleware(mux)
 	loggedRouter := loggingMiddleward(corsRouter)
