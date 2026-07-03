@@ -20,7 +20,7 @@ jobs:
         run: |
           echo ${GITHUB_RUN_NUMBER}
           echo $(pwd)
-          GOARCH=amd64 GOOS=linux CGO_ENABLED=0 docker run -v $(pwd):/alfa -w /alfa golang:1.23.2-alpine3.20 go build -o todo-api-go ./start.go
+          GOARCH=amd64 GOOS=linux CGO_ENABLED=0 docker run -v $(pwd):/alfa -w /alfa golang:1.26.4-alpine3.24 go build -o todo-api-go ./start.go
           echo $(pwd)
           docker build . -t 169533462518.dkr.ecr.us-east-2.amazonaws.com/todo-api-go:1.0.${GITHUB_RUN_NUMBER}
 
