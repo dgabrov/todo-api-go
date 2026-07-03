@@ -73,4 +73,5 @@ All IDs are UUID strings stored as `varchar(64)`.
 
 ## Deployment
 
-CI (`build.yml`) builds a static Linux binary inside a `golang:1.23.2-alpine3.20` Docker container, then wraps it in an `amd64/alpine` image pushed to AWS ECR. The binary is the only artifact in the image — no external runtime dependencies.
+CI (`build.yml`) builds a static Linux binary inside a `golang:1.26.4-alpine3.24` Docker container, then wraps it in an `amd64/alpine` image pushed to AWS ECR. The binary is the only artifact in the image — no external runtime dependencies.
+restart
