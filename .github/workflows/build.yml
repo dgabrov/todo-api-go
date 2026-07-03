@@ -1,10 +1,15 @@
 name: build todo api go
 run-name: build todo api go
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
 
 jobs:
   docker_login:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     name: build todo go
     steps:
