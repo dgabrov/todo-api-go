@@ -2,6 +2,7 @@ package data
 
 type Secret struct {
 	Id       string `json:"id"`
+	Comment  string `json:"comment"`
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
